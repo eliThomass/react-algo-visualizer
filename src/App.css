@@ -1,4 +1,16 @@
+#container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+
 .cell {
-  background-color: rgb(233, 233, 233);
-  border: 1px 
+  border: 1px ;
+  gap: 0px;
+  border: 0.5px rgba(0, 0, 0, 0.289) solid;
+  height: 40px;
+  width: 40px;
 }
