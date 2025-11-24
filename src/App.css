@@ -6,11 +6,31 @@
   flex-direction: column;
 }
 
+.grids {
+  display: flex;
+  flex-direction: row;
+  gap: 50px;
+}
+
+.grid {
+  display: flex;
+  row-gap: 0px;
+  column-gap: 0px;
+  border: 3px black solid;
+  width: 450px;
+  height: 450px;
+}
+
+.row {
+  display: flex;
+  gap: 0px;
+  flex-direction: column;
+}
 
 .cell {
   border: 1px ;
   gap: 0px;
   border: 0.5px rgba(0, 0, 0, 0.289) solid;
-  height: 40px;
-  width: 40px;
+  height: 30px;
+  width: 30px;
 }
