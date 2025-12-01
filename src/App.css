@@ -34,3 +34,16 @@
   height: 30px;
   width: 30px;
 }
+
+.grid-wrapper {
+  display: flex;
+  flex-direction: column;
+}
+
+.grid-wrapper select {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+

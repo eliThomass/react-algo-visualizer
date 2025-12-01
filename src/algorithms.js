@@ -7,16 +7,15 @@ export function dfs(i, j, target, maze, visit = new Set(), history = []) {
     if(i >= ROWS || j >= COLS || i < 0 || j < 0 || visit.has(key) || maze[i][j] === 1) {
         return
     }
-    if(i === target[0] && j === target[1]) {
-        history.push({ r: i, c: j, val: 3 });
-        return true
-    }
 
     visit.add(key)
     if (i === 0 && j === 0) {
-        history.push({ r: i, c: j, val: 4 });
+        history.push({ r: i, c: j, val: 4 }); // Start
+    } else if (i === target[0] && j === target[1]) {
+        history.push({ r: i, c: j, val: 3 }); // Target
+        return true;
     } else {
-        history.push({ r: i, c: j, val: 2 });
+        history.push({ r: i, c: j, val: 2 }); // Visited
     }
 
     let found = dfs(i + 1, j, target, maze, visit, history) 
@@ -25,7 +24,15 @@ export function dfs(i, j, target, maze, visit = new Set(), history = []) {
         || dfs(i, j - 1, target, maze, visit, history);
 
     if(!found) {
-        history.push({ r: i, c: j, val: 0 });
+        // Backtrack - mark as visited but dead end
+        if (!(i === 0 && j === 0)) {
+            history.push({ r: i, c: j, val: 0 });
+        }
+    } else {
+        // Found path, mark as path (blue), excluding start
+        if (!(i === 0 && j === 0) && !(i === target[0] && j === target[1])) {
+            history.push({ r: i, c: j, val: 5 });
+        }
     }
 
     return found
@@ -36,6 +43,8 @@ export function bfs(i, j, target, maze, visit = new Set(), history = []) {
     let COLS = maze[0].length;
     let queue = [[i, j]];
     let key = `${i},${j}`;
+
+    let parentMap = new Map();
 
     visit.add(key);
     if (i === 0 && j === 0) {
@@ -49,6 +58,16 @@ export function bfs(i, j, target, maze, visit = new Set(), history = []) {
 
         if(currI === target[0] && currJ === target[1]) {
             history.push({ r: currI, c: currJ, val: 3 });
+            
+            let curr = parentMap.get(`${currI},${currJ}`);
+            while (curr) {
+                let [pI, pJ] = curr;
+                if (pI === 0 && pJ === 0) break;
+                
+                history.push({ r: pI, c: pJ, val: 5 });
+                curr = parentMap.get(`${pI},${pJ}`);
+            }
+            
             return true;
         }
 
@@ -62,7 +81,11 @@ export function bfs(i, j, target, maze, visit = new Set(), history = []) {
             }
 
             visit.add(nextKey);
-            history.push({ r: nextI, c: nextJ, val: 2 });
+            parentMap.set(nextKey, [currI, currJ]);
+            if (nextI === target[0] && nextJ === target[1]) {
+            } else {
+                history.push({ r: nextI, c: nextJ, val: 2 });
+            }
             queue.push([nextI, nextJ]);
         }
     }

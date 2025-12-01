@@ -1,21 +1,30 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import './App.css'
 import { dfs, bfs } from './algorithms'
+import Grid from './Grid'
 
 function App() {
-
   const [isMouseDown, setIsMouseDown] = useState(false);
   const [drawValue, setDrawValue] = useState(1);
+  const [algo1, setAlgo1] = useState('DFS');
+  const [algo2, setAlgo2] = useState('BFS');
 
-  const [maze, setMaze] = useState(() => {
-    return Array(15).fill().map(() => Array(15).fill(0));
-  })
-  const [maze2, setMaze2] = useState(() => {
-    return Array(15).fill().map(() => Array(15).fill(0));
-  })
+  const [targetMode, setTargetMode] = useState(false);
+  const [targetPos, setTargetPos] = useState([10, 10]);
 
-  const handleCell = (type, row, col, newValue) => {
-    if(type == 'DFS') {
+  const timeoutIds = useRef([]);
+
+  const generateGrid = (target) => {
+    const grid = Array(15).fill().map(() => Array(15).fill(0));
+    grid[target[0]][target[1]] = 3; // 3 = Green Target
+    return grid;
+  };
+
+  const [maze, setMaze] = useState(() => generateGrid([10, 10]));
+  const [maze2, setMaze2] = useState(() => generateGrid([10, 10]));
+
+  const handleCell = (gridId, row, col, newValue) => {
+    if(gridId === 1) {
       setMaze((prevMaze) => {
         return prevMaze.map((gridRow, rIndex) => {
           if (rIndex === row) {
@@ -27,7 +36,7 @@ function App() {
         });
       });
     }
-    if(type == 'BFS') {
+    if(gridId === 2) {
       setMaze2((prevMaze) => {
         return prevMaze.map((gridRow, rIndex) => {
           if (rIndex === row) {
@@ -39,23 +48,35 @@ function App() {
         });
       });
     }
-
   };
 
   const handleMouseDown = (row, col, currentVal) => {
+    if (targetMode) {
+      handleCell(1, targetPos[0], targetPos[1], 0);
+      handleCell(2, targetPos[0], targetPos[1], 0);
+
+      
+      setTargetPos([row, col]);
+      handleCell(1, row, col, 3);
+      handleCell(2, row, col, 3);
+
+      setTargetMode(false);
+      return;
+    }
     setIsMouseDown(true);
     
     const newVal = currentVal === 1 ? 0 : 1; 
     setDrawValue(newVal);
     handleCell(row, col, newVal);
-    handleCell('DFS', row, col, drawValue);
-    handleCell('BFS', row, col, drawValue);
+    handleCell(1, row, col, drawValue);
+    handleCell(2, row, col, drawValue);
   };
 
   const handleMouseEnter = (row, col) => {
     if (isMouseDown) {
-      handleCell('DFS', row, col, drawValue);
-      handleCell('BFS', row, col, drawValue);
+      if (row === targetPos[0] && col === targetPos[1]) return;
+      handleCell(1, row, col, drawValue);
+      handleCell(2, row, col, drawValue);
     }
   };
 
@@ -63,81 +84,87 @@ function App() {
     setIsMouseDown(false);
   };
 
-  const visualizePath = () => {
-    let mazeCopy = JSON.parse(JSON.stringify(maze));
-    let historyDFS = [];
-    let mazeCopy2 = JSON.parse(JSON.stringify(maze));
-    let historyBFS = [];
-    
-    bfs(0, 0, [10, 10], mazeCopy, new Set(), historyBFS);
-    dfs(0, 0, [10, 10], mazeCopy2, new Set(), historyDFS);
+  const runAlgorithm = (name, grid, history) => {
+    if (name === 'DFS') dfs(0, 0, targetPos, grid, new Set(), history);
+    if (name === 'BFS') bfs(0, 0, targetPos, grid, new Set(), history);
+  };
 
-    const maxSteps = Math.max(historyDFS.length, historyBFS.length);
+  const visualizePath = () => {
+    timeoutIds.current.forEach(clearTimeout);
+    timeoutIds.current = [];
+    let mazeCopy = JSON.parse(JSON.stringify(maze));
+    let history1 = [];
+    let mazeCopy2 = JSON.parse(JSON.stringify(maze));
+    let history2 = [];
+    
+    runAlgorithm(algo1, mazeCopy, history1);
+    runAlgorithm(algo2, mazeCopy2, history2);
+
+    const maxSteps = Math.max(history1.length, history2.length);
 
     for (let i = 0; i < maxSteps; i++) {
-      setTimeout(() => {
-        if (i < historyDFS.length) {
-          const stepA = historyDFS[i];
-          handleCell('DFS', stepA.r, stepA.c, stepA.val);
+      const id = setTimeout(() => {
+        if (i < history1.length) {
+          const stepA = history1[i];
+          handleCell(1, stepA.r, stepA.c, stepA.val);
         }
 
-        if (i < historyBFS.length) {
-          const stepB = historyBFS[i];
-          handleCell('BFS', stepB.r, stepB.c, stepB.val);
+        if (i < history2.length) {
+          const stepB = history2[i];
+          handleCell(2, stepB.r, stepB.c, stepB.val);
         }
-
       }, 40 * i);
+
+      timeoutIds.current.push(id);
     }
   };
+
+  const handleReset = () => {
+    timeoutIds.current.forEach(clearTimeout);
+    timeoutIds.current = [];
+    setMaze(generateGrid(targetPos));
+    setMaze2(generateGrid(targetPos));
+    
+  }
+
+  const handleTarget = () => {
+    setTargetMode(!targetMode); // Toggle allowing user to cancel
+  }
 
   return (
     <>
       <div id='container' onMouseUp={handleMouseUp}>
-        <button onClick={() => visualizePath()}> DFS Visualization </button>
+        <button onClick={() => visualizePath()}> Compare! </button>
 
         <div className='grids'>
-          <p className='grid' onMouseLeave={handleMouseUp}>{maze.map((row, rowIndex) => (
-            <div key={rowIndex} className='row'>
-              {row.map((item, itemIndex) => (
-                <button key={itemIndex} 
-                  onMouseDown={() => handleMouseDown(rowIndex, itemIndex, item)}
-                  onMouseEnter={() => handleMouseEnter(rowIndex, itemIndex)}
-                  className='cell' style={{
-                    backgroundColor: 
-                      item === 1 ? "black" 
-                      : item === 2 ? "rgba(247, 244, 86, 1)" 
-                      : item === 3 ? "rgba(97, 178, 70, 1)" 
-                      : item === 4 ? "red" 
-                      : "rgb(233, 233, 233)"
-                }}>
-                  
-                </button>
-              ))}
-            </div>
-         ))}
-        </p>
-
-        <p className='grid' onMouseLeave={handleMouseUp}>{maze2.map((row, rowIndex) => (
-          <div key={rowIndex} className='row'>
-            {row.map((item, itemIndex) => (
-              <button key={itemIndex} 
-                onMouseDown={() => handleMouseDown(rowIndex, itemIndex, item)}
-                onMouseEnter={() => handleMouseEnter(rowIndex, itemIndex)}
-                className='cell' style={{
-                  backgroundColor: 
-                    item === 1 ? "black" 
-                    : item === 2 ? "rgba(247, 244, 86, 1)" 
-                    : item === 3 ? "rgba(97, 178, 70, 1)" 
-                    : item === 4 ? "red" 
-                    : "rgb(233, 233, 233)"
-              }}>
-                
-              </button>
-            ))}
+          <div className='grid-wrapper'>
+            <Grid 
+              mazeData={maze}
+              handleMouseDown={handleMouseDown}
+              handleMouseEnter={handleMouseEnter}
+              handleMouseUp={handleMouseUp}
+            />
+            <select value={algo1} onChange={(e) => setAlgo1(e.target.value)}>
+              <option value="DFS">DFS</option>
+              <option value="BFS">BFS</option>
+            </select>
           </div>
-          ))}
-        </p>
+
+          <div className='grid-wrapper'>
+            <Grid 
+              mazeData={maze2}
+              handleMouseDown={handleMouseDown}
+              handleMouseEnter={handleMouseEnter}
+              handleMouseUp={handleMouseUp}
+            />
+            <select value={algo2} onChange={(e) => setAlgo2(e.target.value)}>
+              <option value="DFS">DFS</option>
+              <option value="BFS">BFS</option>
+            </select>
+          </div>
         </div>
+        <button onClick={handleTarget} style={{marginTop: "10px", marginBottom: "10px"}}> Set Target </button>
+        <button onClick={handleReset}> Reset Board </button>
         
       </div>
     </>
