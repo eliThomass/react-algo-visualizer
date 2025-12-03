@@ -3,6 +3,7 @@ import './App.css'
 import { dfs, bfs } from './algorithms'
 import Grid from './Grid'
 import SortVisualizer from './SortVisualizer'
+import Header from './Header'
 
 function App() {
   const [isMouseDown, setIsMouseDown] = useState(false)
@@ -101,33 +102,39 @@ function App() {
   }
 
   return (
-    <div id='container' onMouseUp={handleMouseUp}>
-      <button onClick={visualizePath}>Compare!</button>
+    <div>
+      <Header></Header>
+      <div id='container' onMouseUp={handleMouseUp}>
+        
 
-      <div className='grids'>
-        <div className='grid-wrapper'>
-          <Grid mazeData={maze} handleMouseDown={handleMouseDown} handleMouseEnter={handleMouseEnter} handleMouseUp={handleMouseUp} />
-          <select value={algo1} onChange={e => setAlgo1(e.target.value)}>
-            <option value='DFS'>DFS</option>
-            <option value='BFS'>BFS</option>
-          </select>
+        <div className='grids'>
+          <div className='grid-wrapper'>
+            <Grid mazeData={maze} handleMouseDown={handleMouseDown} handleMouseEnter={handleMouseEnter} handleMouseUp={handleMouseUp} />
+            <select value={algo1} onChange={e => setAlgo1(e.target.value)}>
+              <option value='DFS'>DFS</option>
+              <option value='BFS'>BFS</option>
+            </select>
+          </div>
+
+          <div className='grid-wrapper'>
+            <Grid mazeData={maze2} handleMouseDown={handleMouseDown} handleMouseEnter={handleMouseEnter} handleMouseUp={handleMouseUp} />
+            <select value={algo2} onChange={e => setAlgo2(e.target.value)}>
+              <option value='DFS'>DFS</option>
+              <option value='BFS'>BFS</option>
+            </select>
+          </div>
         </div>
 
-        <div className='grid-wrapper'>
-          <Grid mazeData={maze2} handleMouseDown={handleMouseDown} handleMouseEnter={handleMouseEnter} handleMouseUp={handleMouseUp} />
-          <select value={algo2} onChange={e => setAlgo2(e.target.value)}>
-            <option value='DFS'>DFS</option>
-            <option value='BFS'>BFS</option>
-          </select>
+        <div className='buttonGridMenu'>
+          <button onClick={() => setTargetMode(!targetMode)}>Set Target</button>
+          <button onClick={handleReset}>Reset Board</button>
+          <button onClick={visualizePath}>Compare!</button>
         </div>
+      
+        <hr style={{ margin: '40px 0' }} />
+
+        <SortVisualizer />
       </div>
-
-      <button onClick={() => setTargetMode(!targetMode)} style={{ margin: '10px 0' }}>Set Target</button>
-      <button onClick={handleReset}>Reset Board</button>
-
-      <hr style={{ margin: '40px 0' }} />
-
-      <SortVisualizer />
     </div>
   )
 }

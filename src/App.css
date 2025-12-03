@@ -1,9 +1,32 @@
+body {
+  background-color: rgb(208, 221, 232);
+  font-family:Georgia, 'Times New Roman', Times, serif;
+}
+.headermain {
+  height: 150px;
+  width: 100%;
+  font-size: 40px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background-color: aliceblue;
+  border-radius: 15px;
+}
+
+.headermain p {
+  margin: 5px;
+  gap: 0px;
+}
+
 #container {
+  margin-top: 20px;
   width: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
   flex-direction: column;
+  margin-bottom: 0px;
 }
 
 .grids {
@@ -41,9 +64,34 @@
 }
 
 .grid-wrapper select {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
+  padding: 8px 15px;
+  margin-top: 10px;
+  font-size: 16px;
+  border-radius: 8px;
+  border: 2px solid #9ca3af; /* Light gray border */
+  background-color: white;
+  appearance: none; /* Removes default OS styling */
+  cursor: pointer;
 }
 
+.buttonGridMenu {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  margin: 15px;
+}
+
+.buttonGridMenu button {
+  border-radius: 8px;
+  border: 2px solid #94a0b6;
+  padding: 10px;
+}
+
+.buttonGridMenu button:hover {
+  background-color:rgba(154, 176, 197, 0.489);
+  transform: translateY(-2px);
+}
+
+.buttonGridMenu button:active {
+  transform: translateY(2px);
+}
