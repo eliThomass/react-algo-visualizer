@@ -1,0 +1,15 @@
+#sort-box {
+  width: 450px;
+  height: 300px;
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  border: 1px solid black;
+  background: #fafafa;
+}
+
+.sort-buttons {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 10px;
+}
