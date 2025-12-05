@@ -6,7 +6,9 @@ export default function SortVisualizer() {
   const ARRAY_SIZE = 40;
 
   const generateArray = () => {
-    return Array.from({ length: ARRAY_SIZE }, () => Math.floor(Math.random() * 200) + 10);
+    return Array.from({ length: ARRAY_SIZE }, () =>
+      Math.floor(Math.random() * 200) + 10
+    );
   };
 
   const [array, setArray] = useState(generateArray());
@@ -24,23 +26,22 @@ export default function SortVisualizer() {
   };
 
   return (
-    <div>
+    <div id="sort-container">
       <div className="sort-buttons">
         <button onClick={newArray} disabled={isSorting}>Create New Array</button>
         <button onClick={() => runSort(bubbleSort)} disabled={isSorting}>Bubble Sort</button>
         <button onClick={() => runSort(selectionSort)} disabled={isSorting}>Selection Sort</button>
       </div>
 
-      <div id="sort-box" style={{ display: "flex", alignItems: "flex-end", gap: "2px", border: "1px solid black", height: "300px", background: "#fafafa" }}>
+      <div id="sort-box">
         {array.map((value, idx) => (
           <div
             key={idx}
             className="bar"
-            style={{ width: "10px", height: `${value}px`, backgroundColor: "rgba(97, 178, 70, 1)" }}
+            style={{ height: `${value}px` }}
           ></div>
         ))}
       </div>
     </div>
   );
 }
- 
