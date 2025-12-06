@@ -1,6 +1,6 @@
 # Algorithm Visualizer
 
-![Pathfinding in action](./src/assets/pathfind)
+![Pathfinding in action](./src/assets/pathfind.png)
 
 A frontend project allowing the visualize of multiple different types of algorithms that can be interacted with by the user.
 
